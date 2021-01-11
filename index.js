@@ -1,10 +1,23 @@
 const express = require('express')
 const passport = require('passport')
-const GoogleStrategy = require('passport-google-strategy').strategy
-
+const GoogleStrategy = require('passport-google-oauth20').Strategy
+const keys = require('./config/keys')
 const app = express()
 
-passport.use(new GoogleStrategy())
+passport.use(new GoogleStrategy({
+  clientID: keys.googleClientID,
+  clientSecret: keys.googleClientSecret,
+  callbackURL: '/auth/google/callback'
+}, 
+accessToken => {
+  console.log(accessToken)
+}
+))
+//route handler
+app.get('/auth/google',
+passport.authenticate('google', {
+  scope: ['profile', 'email']
+}))
 
 //route handler
 // app.get('/', (req, res) => {
@@ -12,4 +25,4 @@ passport.use(new GoogleStrategy())
 // })
 
 const PORT = process.env.PORT || 5000
-app.listen(5000)
+app.listen(PORT)
